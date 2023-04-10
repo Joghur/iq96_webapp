@@ -14,7 +14,3 @@ src/settings/firebaseConfig.ts
 
 # Optional eslint cache
 .eslintcache
-
-
-
-
