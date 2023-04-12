@@ -31,7 +31,7 @@ const handleHeaderTitle = (key: number) => {
 
 const App = () => {
   const [authUser, documentUser, loading] = useDocumentUser();
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState(1);
   const [showLogin, setShowLogin] = useState(!authUser);
 
   //   console.log('user', user?.displayName, user?.email);

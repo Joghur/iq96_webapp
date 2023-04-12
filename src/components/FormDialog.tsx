@@ -15,7 +15,7 @@ interface Props {
   onClose: () => void;
   event?: EventType;
   editable?: boolean;
-  updatingDoc: any;
+  updatingDoc: (id: string, document: EventType) => void;
 }
 
 export const BoldText = styled(Typography)({
@@ -59,12 +59,10 @@ export default function FormDialog({
     onClose();
   };
 
-  const handleChange = (event: any) => {
-    console.log('event', event);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target) {
       const {id, value} = event.target;
 
-      console.log('handleChange value', value);
       setChangingEvent(oldEvent => ({
         ...oldEvent,
         [id]: value,
@@ -72,9 +70,9 @@ export default function FormDialog({
     }
   };
 
-  const handleSubmit = async () => {
-    if (editable) {
-      await updatingDoc(changedEvent.id, {
+  const handleSubmit = () => {
+    if (editable && changedEvent?.id) {
+      updatingDoc(changedEvent.id, {
         ...changedEvent,
       });
     }

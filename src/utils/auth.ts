@@ -1,5 +1,6 @@
 // import {deleteData, keys} from './async';
 
+import {FirebaseError} from 'firebase/app';
 import {
   getAuth,
   sendPasswordResetEmail,
@@ -8,6 +9,27 @@ import {
 } from 'firebase/auth';
 
 const auth = getAuth();
+
+const handleError = (error: FirebaseError | unknown) => {
+  if (typeof error === 'object' && error !== null && 'code' in error) {
+    switch (error?.code) {
+      case 'auth/user-not-found':
+        return 'Ugyldig email';
+
+      case 'auth/wrong-password':
+        return 'Ugyldigt kodeord.';
+
+      case 'auth/too-many-requests':
+        return 'For mange login forsøg. Forsøg igen senere.';
+
+      case 'auth/network-request-failed':
+        return 'Netwærk fejl. Forsøg igen senere.';
+
+      default:
+        return 'Ukendt fejl under indlogning.';
+    }
+  }
+};
 
 export const logIn = async (
   email: string | undefined,
@@ -19,7 +41,7 @@ export const logIn = async (
       userObj = await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       console.log('Login error: ', error);
-      alert('Der er skete en fejl under indlogning.');
+      alert(handleError(error));
     }
     return userObj;
   }
@@ -42,6 +64,6 @@ export const resetPassword = async (email: string) => {
     await sendPasswordResetEmail(auth, email);
   } catch (error) {
     console.log('Logout error: ', error);
-    alert('Der er skete en fejl under log ud!');
+    alert('Der er skete en fejl under reset kodeord!');
   }
 };

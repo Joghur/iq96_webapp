@@ -67,9 +67,8 @@ const Login = ({open, onClose}: Props) => {
     setUserCredentials(initUserCredentials);
   };
 
-  const handleChange = (event: any) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {id, value} = event.target;
-    console.log('id, value', id, value);
 
     setUserCredentials(oldCreds => ({
       ...oldCreds,

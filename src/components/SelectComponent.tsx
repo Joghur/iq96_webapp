@@ -9,7 +9,7 @@ interface Option {
 
 interface Props {
   options: Option[];
-  onChange: any;
+  onChange: (event: SelectChangeEvent<string>) => void;
 }
 
 export default function SelectComponent({options, onChange}: Props) {

@@ -28,22 +28,6 @@ export type EventType = {
   notes?: string;
 };
 
-export type EventTypeInput = {
-  id?: string;
-  city: string;
-  country: string;
-  end: string;
-  endDate?: Date;
-  start: string;
-  startDate?: Date;
-  timezone: string;
-  type: string;
-  year: number;
-  activities?: string;
-  meetingPoints: string;
-  notes?: string;
-};
-
 interface Props {
   authUser: User | null;
   documentUser: DocumentUser | null;
@@ -51,7 +35,11 @@ interface Props {
 }
 
 const Home = ({authUser, documentUser, showLogin}: Props) => {
-  const {docs, loading, updatingDoc} = useFirestore('events', 'startDate');
+  const {
+    docs: events,
+    loading,
+    updatingDoc,
+  } = useFirestore<EventType>('events', 'startDate');
   const [currentEvent, setCurrentEvent] = useState<EventType | null>(null);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -66,16 +54,20 @@ const Home = ({authUser, documentUser, showLogin}: Props) => {
     );
   }
 
-  if (loading) {
+  if (loading || !events) {
     return <SkeletonComponent />;
   }
 
   const handleUpdate = async (
     _: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    id: undefined,
+    id: string | undefined,
   ) => {
+    if (!id) {
+      return;
+    }
+
     setCurrentEvent(
-      () => docs.filter(o => o.id === id)[0] as unknown as EventType,
+      () => events?.filter(o => o.id === id)[0] as unknown as EventType,
     );
     setShowDialog(true);
   };
@@ -88,52 +80,52 @@ const Home = ({authUser, documentUser, showLogin}: Props) => {
   return (
     <>
       <Box>
-        {docs.map(doc => {
+        {events.map(event => {
           return (
             <Paper elevation={4} sx={{m: 3, p: 2}}>
               <Stack spacing={2}>
                 <Stack spacing={1} direction="row">
                   <DynamicText mobile="h6" desktop="h5">
-                    {doc?.type === 'tour'
-                      ? `${handleType(doc?.type)} de ${doc.city}`
-                      : handleType(doc?.type)}
+                    {event?.type === 'tour'
+                      ? `${handleType(event?.type)} de ${event.city}`
+                      : handleType(event?.type)}
                   </DynamicText>
-                  {canEdit && (
+                  {canEdit && event.id && (
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={e => handleUpdate(e, doc.id)}>
-                      Update
+                      onClick={e => handleUpdate(e, event.id)}>
+                      Opdater
                     </Button>
                   )}
                 </Stack>
-                {!!doc?.startDate && (
+                {!!event?.startDate && (
                   <Stack>
                     <DynamicText>
                       <strong>Start:</strong>
                     </DynamicText>
                     <DynamicText mobile="caption" sx={{ml: 2}}>
-                      {doc.start}
+                      {event.start}
                     </DynamicText>
                   </Stack>
                 )}
-                {!!doc?.endDate && (
+                {!!event?.endDate && (
                   <Stack>
                     <DynamicText>
                       <strong>Slut:</strong>
                     </DynamicText>
                     <DynamicText mobile="caption" sx={{ml: 2}}>
-                      {doc.end}
+                      {event.end}
                     </DynamicText>
                   </Stack>
                 )}
-                {doc.meetingPoints.trim() && (
+                {event.meetingPoints.trim() && (
                   <Stack>
                     <DynamicText>
                       <strong>Mødesteder:</strong>
                     </DynamicText>
                     <DynamicText mobile="caption">
-                      {doc.meetingPoints.split('--').map((f: string) => {
+                      {event.meetingPoints.split('--').map((f: string) => {
                         return (
                           <Box sx={{ml: 4}}>
                             <li>{f.trim()}</li>
@@ -143,28 +135,26 @@ const Home = ({authUser, documentUser, showLogin}: Props) => {
                     </DynamicText>
                   </Stack>
                 )}
-                {doc.notes.trim() && (
+                {event?.notes?.trim() && (
                   <Stack>
                     <DynamicText>
                       <strong>OBS:</strong>
                     </DynamicText>
-                    {doc.notes.split('--').map((f: string) => {
-                      return (
-                        <Box sx={{ml: 4}}>
-                          <li>
-                            <DynamicText mobile="caption">
-                              {f.trim()}
-                            </DynamicText>
-                          </li>
-                        </Box>
-                      );
-                    })}
+                    <DynamicText mobile="caption">
+                      {event.notes.split('--').map((f: string) => {
+                        return (
+                          <Box sx={{ml: 4}}>
+                            <li>{f.trim()}</li>
+                          </Box>
+                        );
+                      })}
+                    </DynamicText>
                   </Stack>
                 )}
-                {doc.activities.trim() && (
+                {event?.activities?.trim() && (
                   <DynamicText>
                     <strong>Aktiviteter:</strong>
-                    {doc.activities.split('--').map((f: string) => {
+                    {event.activities.split('--').map((f: string) => {
                       return (
                         <Box sx={{ml: 4}}>
                           <DynamicText mobile="caption">

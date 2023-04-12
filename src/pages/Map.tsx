@@ -10,24 +10,30 @@ import {
 } from 'react-leaflet';
 import L, {Icon} from 'leaflet';
 import {useFirestore} from '../utils/hooks/useFirestore';
-import {Button, Stack, useMediaQuery, useTheme} from '@mui/material';
+import {
+  Button,
+  SelectChangeEvent,
+  Stack,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import SkeletonComponent from '../components/SkeletonComponent';
 import type {User} from 'firebase/auth';
 import SelectComponent from '../components/SelectComponent';
 
-// interface Coordinate {
-//   lat: number;
-//   lng: number;
-// }
+interface Coordinate {
+  latitude: number;
+  longitude: number;
+}
 
-// interface MarkerData {
-//   location: Coordinate;
-//   description: string;
-//   madeBy: string;
-//   nick: string;
-//   title: string;
-//   type: string;
-// }
+interface MarkerData {
+  location: Coordinate;
+  description: string;
+  madeBy: string;
+  nick: string;
+  title: string;
+  type: string;
+}
 
 interface Props {
   authUser: User | null;
@@ -44,16 +50,18 @@ const handleDocType = (docType: string, madeBy: string) => {
   }
 };
 
-function FlyToSelector({markers}: any) {
+const FlyToSelector = ({markers}: {markers: MarkerData[]}) => {
   const map = useMap();
   const [center, setCenter] = useState([
     markers[0].location.latitude,
     markers[0].location.longitude,
   ]);
 
-  const handleSelectChange = (event: any) => {
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
-    const selectedMarker = markers.filter((d: any) => d.title === value)[0];
+    const selectedMarker = markers.filter(
+      (d: MarkerData) => d.title === value,
+    )[0];
     setCenter([
       selectedMarker.location.latitude,
       selectedMarker.location.longitude,
@@ -67,7 +75,7 @@ function FlyToSelector({markers}: any) {
     });
   }, [center[0]]);
 
-  const selectValues = markers.map((s: any) => ({
+  const selectValues = markers.map(s => ({
     value: s.title,
     label: s.nick,
     colour: s.madeBy === 'app' ? 'red' : 'black',
@@ -76,47 +84,7 @@ function FlyToSelector({markers}: any) {
   return (
     <SelectComponent onChange={handleSelectChange} options={selectValues} />
   );
-}
-
-// function UserMapComponent() {
-//   const map = useMap();
-//   const [pos, setPos] = useState<number[]>([]);
-
-//   useEffect(() => {
-//     navigator.geolocation.getCurrentPosition(
-//       position => {
-//         const {latitude, longitude} = position.coords;
-//         setPos([latitude, longitude]);
-//         map.flyTo([latitude, longitude], map.getZoom());
-//       },
-//       error => console.error(error),
-//       {
-//         enableHighAccuracy: true,
-//         timeout: 5000,
-//         maximumAge: 0,
-//       },
-//     );
-//   }, [map]);
-
-//   return (
-//     <>
-//       {pos.length > 0 && (
-//         <Marker
-//           position={[pos[0], pos[1]]}
-//           icon={
-//             new Icon({
-//               iconUrl: `marker-icon.png`,
-//               iconSize: [25, 25],
-//               iconAnchor: [18, 18],
-//               popupAnchor: [0, -10],
-//             })
-//           }>
-//           <Popup>Du</Popup>
-//         </Marker>
-//       )}
-//     </>
-//   );
-// }
+};
 
 function UserMapButton() {
   const map = useMapEvents({
@@ -143,7 +111,7 @@ function UserMapButton() {
 }
 
 const Map = ({authUser, showLogin}: Props) => {
-  const {docs, loading} = useFirestore('map', 'type');
+  const {docs, loading} = useFirestore<MarkerData>('map', 'type');
 
   const theme = useTheme();
   const small = useMediaQuery(theme.breakpoints.down('sm'));
@@ -166,10 +134,10 @@ const Map = ({authUser, showLogin}: Props) => {
     );
   }
 
-  if (loading) {
+  if (loading || !docs) {
     return <SkeletonComponent />;
   }
-  const centerArray = docs?.filter(d => d.madeBy === 'app');
+  const centerArray = docs.filter(d => d.madeBy === 'app');
 
   return (
     <>
@@ -226,3 +194,43 @@ const Map = ({authUser, showLogin}: Props) => {
 };
 
 export default memo(Map);
+
+// function UserMapComponent() {
+//   const map = useMap();
+//   const [pos, setPos] = useState<number[]>([]);
+
+//   useEffect(() => {
+//     navigator.geolocation.getCurrentPosition(
+//       position => {
+//         const {latitude, longitude} = position.coords;
+//         setPos([latitude, longitude]);
+//         map.flyTo([latitude, longitude], map.getZoom());
+//       },
+//       error => console.error(error),
+//       {
+//         enableHighAccuracy: true,
+//         timeout: 5000,
+//         maximumAge: 0,
+//       },
+//     );
+//   }, [map]);
+
+//   return (
+//     <>
+//       {pos.length > 0 && (
+//         <Marker
+//           position={[pos[0], pos[1]]}
+//           icon={
+//             new Icon({
+//               iconUrl: `marker-icon.png`,
+//               iconSize: [25, 25],
+//               iconAnchor: [18, 18],
+//               popupAnchor: [0, -10],
+//             })
+//           }>
+//           <Popup>Du</Popup>
+//         </Marker>
+//       )}
+//     </>
+//   );
+// }

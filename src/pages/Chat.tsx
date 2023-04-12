@@ -54,10 +54,9 @@ const Chat = ({authUser, documentUser, showLogin}: Props) => {
     setDays(old => old + days);
   };
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
+  const handleSubmit = () => {
     if (input.trim() !== '') {
-      await addingDoc({
+      addingDoc({
         createdAt: new Date(),
         group: 'general',
         text: input.trim(),
@@ -136,16 +135,14 @@ const Chat = ({authUser, documentUser, showLogin}: Props) => {
         </Paper>
       </Box>
       <Box sx={{display: 'flex', gap: '16px', padding: '16px'}}>
-        <form onSubmit={handleSubmit} style={{flexGrow: 1}}>
-          <TextField
-            label="Skriv din besked"
-            variant="outlined"
-            size="small"
-            fullWidth
-            value={input}
-            onChange={event => setInput(event.target.value)}
-          />
-        </form>
+        <TextField
+          label="Skriv din besked"
+          variant="outlined"
+          size="small"
+          fullWidth
+          value={input}
+          onChange={event => setInput(event.target.value)}
+        />
         <Button variant="contained" onClick={handleSubmit}>
           Send
         </Button>

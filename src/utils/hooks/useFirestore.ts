@@ -18,6 +18,8 @@ import {
   deleteDoc,
   where,
   Timestamp,
+  Query,
+  CollectionReference,
 } from 'firebase/firestore';
 
 export interface DocumentUser {
@@ -34,7 +36,6 @@ export interface DocumentUser {
   title: string;
 }
 
-type FirestoreDoc = DocumentData;
 export type CollectionName = 'events' | 'map' | 'chats';
 
 // Initialize Firebase app
@@ -42,17 +43,20 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-export const useFirestore = (collectionName: CollectionName, order: string) => {
-  const [docs, setDocs] = useState<FirestoreDoc[]>([]);
+export const useFirestore = <T extends DocumentData>(
+  collectionName: CollectionName,
+  order: string,
+) => {
+  const [docs, setDocs] = useState<T[] | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
   const collectionRef = collection(db, collectionName);
 
-  const addingDoc = async (document: FirestoreDoc) => {
+  const addingDoc = async (document: T) => {
     await addDoc(collectionRef, document);
   };
 
-  const updatingDoc = async (id: string, document: FirestoreDoc) => {
+  const updatingDoc = async (id: string, document: T) => {
     const docRef = doc(collectionRef, id);
     await updateDoc(docRef, {...document});
   };
@@ -62,13 +66,16 @@ export const useFirestore = (collectionName: CollectionName, order: string) => {
   };
 
   useEffect(() => {
-    const collectionRef = query(collection(db, collectionName), orderBy(order));
-    const unsubscribe = onSnapshot(collectionRef, snapshot => {
-      const docs: FirestoreDoc[] = [];
+    const queryRef = query(
+      collection(db, collectionName) as CollectionReference<T>,
+      orderBy(order),
+    ) as Query<T>;
+    const unsubscribe = onSnapshot(queryRef, snapshot => {
+      const docs: T[] = [];
       snapshot.forEach(doc => {
         docs.push({id: doc.id, ...doc.data()});
       });
-      setDocs(docs);
+      setDocs(docs as T[]);
       setLoading(false);
     });
     return unsubscribe;
@@ -82,16 +89,16 @@ export const useFirestoreMax4Days = (
   order: string,
   days = 4,
 ) => {
-  const [docs, setDocs] = useState<FirestoreDoc[]>([]);
+  const [docs, setDocs] = useState<DocumentData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const collectionRef = collection(db, collectionName);
 
-  const addingDoc = async (document: FirestoreDoc) => {
+  const addingDoc = async (document: DocumentData) => {
     await addDoc(collectionRef, document);
   };
 
-  const updatingDoc = async (id: string, document: FirestoreDoc) => {
+  const updatingDoc = async (id: string, document: DocumentData) => {
     const docRef = doc(collectionRef, id);
     await updateDoc(docRef, {...document});
   };
@@ -113,7 +120,7 @@ export const useFirestoreMax4Days = (
     );
     // const collectionRef = query(collection(db, collectionName));
     const unsubscribe = onSnapshot(collectionRef, snapshot => {
-      const docs: FirestoreDoc[] = [];
+      const docs: DocumentData[] = [];
       snapshot.forEach(doc => {
         docs.push({id: doc.id, ...doc.data()});
       });
