@@ -31,7 +31,7 @@ const handleHeaderTitle = (key: number) => {
 
 const App = () => {
   const [authUser, documentUser, loading] = useDocumentUser();
-  const [value, setValue] = React.useState(1);
+  const [value, setValue] = React.useState(0);
   const [showLogin, setShowLogin] = useState(!authUser);
 
   //   console.log('user', user?.displayName, user?.email);
@@ -68,7 +68,7 @@ const App = () => {
   return (
     <>
       <CssBaseline />
-      <Header banner={handleHeaderTitle(value)} nick={documentUser?.nick} />
+      {/* <Header banner={handleHeaderTitle(value)} nick={documentUser?.nick} /> */}
       {value === 0 && (
         <Home
           authUser={authUser}
@@ -76,7 +76,13 @@ const App = () => {
           showLogin={setShowLogin}
         />
       )}
-      {value === 1 && <Map authUser={authUser} showLogin={setShowLogin} />}
+      {value === 1 && (
+        <Map
+          authUser={authUser}
+          documentUser={documentUser}
+          showLogin={setShowLogin}
+        />
+      )}
       {value === 2 && (
         <Chat
           authUser={authUser}
@@ -91,7 +97,11 @@ const App = () => {
           showLogin={setShowLogin}
         />
       )}
-      <FixedBottomNavigation value={value} onChange={setValue} />
+      <FixedBottomNavigation
+        value={value}
+        nick={documentUser?.nick}
+        onChange={setValue}
+      />
     </>
   );
 };
