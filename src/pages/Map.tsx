@@ -35,11 +35,6 @@ interface MarkerData {
   type: string;
 }
 
-interface Props {
-  authUser: User | null;
-  showLogin: (arg0: boolean) => void;
-}
-
 const handleDocType = (docType: string, madeBy: string) => {
   switch (madeBy) {
     case 'app':
@@ -110,33 +105,26 @@ function UserMapButton() {
   );
 }
 
-const Map = ({authUser, showLogin}: Props) => {
+const Map = () => {
   const {docs, loading} = useFirestore<MarkerData>('map', 'type');
 
   const theme = useTheme();
   const small = useMediaQuery(theme.breakpoints.down('sm'));
 
-  console.log('docs', docs);
   const windowHeight = useRef(window.innerHeight);
 
   const minusHeaderBottom = small ? 160 : 190;
   const vh =
     ((windowHeight.current - minusHeaderBottom) * 100) / windowHeight.current;
 
-  if (!authUser) {
-    return (
-      <>
-        <p>Mangler login...</p>
-        <Button variant="outlined" onClick={() => showLogin(true)}>
-          Login
-        </Button>
-      </>
-    );
+  if (!docs) {
+    return null;
   }
 
-  if (loading || !docs) {
+  if (loading) {
     return <SkeletonComponent />;
   }
+
   const centerArray = docs.filter(d => d.madeBy === 'app');
 
   return (

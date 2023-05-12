@@ -10,7 +10,7 @@ import {checkVersion} from './utils/checkVersion';
 import Settings from './pages/Settings';
 import Login from './pages/login';
 import {RefreshButton} from './components/RefreshButton';
-import {Stack} from '@mui/material';
+import {Stack, CircularProgress, Typography, Box} from '@mui/material';
 import Chat from './pages/Chat';
 
 const handleHeaderTitle = (key: number) => {
@@ -31,35 +31,36 @@ const handleHeaderTitle = (key: number) => {
 
 const App = () => {
   const [authUser, documentUser, loading] = useDocumentUser();
-  const [value, setValue] = React.useState(1);
-  const [showLogin, setShowLogin] = useState(!authUser);
-
-  //   console.log('user', user?.displayName, user?.email);
+  const [value, setValue] = React.useState(0);
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     setInterval(checkVersion, 600);
   }, []);
 
-  //   console.log('showLogin', showLogin);
-  //   console.log('user', user);
+  const needLogin = !loading && showLogin;
+  const needAuthUser = loading && !authUser;
+  const needDocumentUser = loading && authUser && !documentUser;
 
-  if (!authUser && showLogin) {
+  if (needLogin) {
     return <Login open={showLogin} onClose={() => setShowLogin(false)} />;
   }
 
-  if (loading && !documentUser) {
+  if (needAuthUser) {
     return (
-      <>
-        <b>Genopfrisk siden</b>
-        <RefreshButton />
-      </>
+      <Box sx={{top: 60}}>
+        <Stack alignItems="center">
+          <CircularProgress />
+        </Stack>
+      </Box>
     );
   }
 
-  if (!documentUser) {
+  if (needDocumentUser) {
     return (
-      <Stack spacing={2}>
-        <b>Genopfrisk siden</b>
+      <Stack alignItems="center">
+        <Typography variant="subtitle1">Data har kløjst i det</Typography>
+        <Typography>Genopfrisk siden</Typography>
         <RefreshButton />
       </Stack>
     );
@@ -69,21 +70,9 @@ const App = () => {
     <>
       <CssBaseline />
       <Header banner={handleHeaderTitle(value)} nick={documentUser?.nick} />
-      {value === 0 && (
-        <Home
-          authUser={authUser}
-          documentUser={documentUser}
-          showLogin={setShowLogin}
-        />
-      )}
-      {value === 1 && <Map authUser={authUser} showLogin={setShowLogin} />}
-      {value === 2 && (
-        <Chat
-          authUser={authUser}
-          documentUser={documentUser}
-          showLogin={setShowLogin}
-        />
-      )}
+      {value === 0 && <Home documentUser={documentUser} />}
+      {value === 1 && <Map />}
+      {value === 2 && <Chat authUser={authUser} documentUser={documentUser} />}
       {value === 3 && (
         <Settings
           authUser={authUser}

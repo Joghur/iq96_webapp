@@ -1,4 +1,4 @@
-import {Box, Button, Stack} from '@mui/material';
+import {Box, Button, Stack, Typography} from '@mui/material';
 import React from 'react';
 import {logOut} from '../utils/auth';
 import {
@@ -39,16 +39,6 @@ const Settings = ({authUser, documentUser, showLogin}: Props) => {
           <DynamicText>{documentUser?.title}</DynamicText>
         )}
         <DynamicText>{authUser?.email}</DynamicText>
-        {documentUser?.title === 'Redacteur' && (
-          <>
-            <Button disabled onClick={() => copyMapMarkers()}>
-              Kopier gamle kortdata
-            </Button>
-            <Button disabled onClick={() => deleteMapMarkers()}>
-              Slet gamle kortdata
-            </Button>
-          </>
-        )}
         <DynamicText>{`IQ96 web app v${packageJson.version}`}</DynamicText>
         <Button
           onClick={async () => {
@@ -57,6 +47,24 @@ const Settings = ({authUser, documentUser, showLogin}: Props) => {
           }}>
           Logout
         </Button>
+        {documentUser?.title === 'Redacteur' && (
+          <>
+            <Typography variant="h6">Admin</Typography>
+            <Button disabled onClick={() => copyMapMarkers()}>
+              Kopier gamle kortdata
+            </Button>
+            <Button disabled onClick={() => deleteMapMarkers()}>
+              Slet gamle kortdata
+            </Button>
+          </>
+        )}
+        <Typography variant="h6">Om</Typography>
+        <ul>
+          <li>
+            0.4.4 - Forbedret login oplevelse (mindre flimren) - check for om
+            lokation er sat til
+          </li>
+        </ul>
       </Stack>
     </Box>
   );

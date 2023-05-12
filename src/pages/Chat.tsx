@@ -9,6 +9,8 @@ import {
   ListItemText,
   useMediaQuery,
   useTheme,
+  Avatar,
+  ListItemAvatar,
 } from '@mui/material';
 import {DocumentUser, useFirestoreMax4Days} from '../utils/hooks/useFirestore';
 import {User} from 'firebase/auth';
@@ -20,10 +22,9 @@ import DynamicText from '../components/DynamicText';
 interface Props {
   authUser: User | null;
   documentUser: DocumentUser | null;
-  showLogin: (arg0: boolean) => void;
 }
 
-const Chat = ({authUser, documentUser, showLogin}: Props) => {
+const Chat = ({authUser, documentUser}: Props) => {
   const [days, setDays] = useState(4);
   const {docs, loading, addingDoc} = useFirestoreMax4Days(
     'chats',
@@ -34,17 +35,6 @@ const Chat = ({authUser, documentUser, showLogin}: Props) => {
 
   const theme = useTheme();
   const small = useMediaQuery(theme.breakpoints.down('sm'));
-
-  if (!authUser) {
-    return (
-      <>
-        <p>Mangler login...</p>
-        <Button variant="outlined" onClick={() => showLogin(true)}>
-          Login
-        </Button>
-      </>
-    );
-  }
 
   if (loading) {
     return <SkeletonComponent />;
@@ -76,9 +66,11 @@ const Chat = ({authUser, documentUser, showLogin}: Props) => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        width: small ? '100vw' : '50vw',
+        width: small ? '100vw' : '95vw',
       }}>
-      <Box
+      <Stack
+        justifyContent="center"
+        alignItems="center"
         sx={{
           flexGrow: 1,
           overflowY: 'auto',
@@ -103,14 +95,16 @@ const Chat = ({authUser, documentUser, showLogin}: Props) => {
                     sx={{
                       padding: '8px 16px',
                       textAlign:
-                        authUser.uid === message.user.id ? 'right' : 'left',
+                        authUser && authUser.uid === message.user.id
+                          ? 'right'
+                          : 'left',
                     }}>
-                    {/* <ListItemAvatar>
-                    <Avatar
-                      alt={message.user.name}
-                      src={`${documentUser?.avatar}.jpg`}
-                    />
-                  </ListItemAvatar> */}
+                    <ListItemAvatar>
+                      <Avatar
+                        alt={message.user.name}
+                        src={`${documentUser?.avatar}.jpg`}
+                      />
+                    </ListItemAvatar>
                     <ListItemText
                       primary={`${
                         message.user.name
@@ -133,7 +127,7 @@ const Chat = ({authUser, documentUser, showLogin}: Props) => {
             </Box>
           )}
         </Paper>
-      </Box>
+      </Stack>
       <Box sx={{display: 'flex', gap: '16px', padding: '16px'}}>
         <TextField
           label="Skriv din besked"

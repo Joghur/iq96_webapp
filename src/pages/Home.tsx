@@ -1,7 +1,7 @@
 // import {useAuth, useFirestore} from '@src/utils/hooks/useFirestore';
 import {DocumentUser, useFirestore} from '../utils/hooks/useFirestore';
 import React, {memo, useState} from 'react';
-import {Box, Button, Paper, Stack} from '@mui/material';
+import {Box, Button, Paper, Stack, Typography} from '@mui/material';
 import {handleType} from '../utils/convertEventType';
 import FormDialog from '../components/FormDialog';
 import SkeletonComponent from '../components/SkeletonComponent';
@@ -29,12 +29,10 @@ export type EventType = {
 };
 
 interface Props {
-  authUser: User | null;
   documentUser: DocumentUser | null;
-  showLogin: (arg0: boolean) => void;
 }
 
-const Home = ({authUser, documentUser, showLogin}: Props) => {
+const Home = ({documentUser}: Props) => {
   const {
     docs: events,
     loading,
@@ -43,19 +41,18 @@ const Home = ({authUser, documentUser, showLogin}: Props) => {
   const [currentEvent, setCurrentEvent] = useState<EventType | null>(null);
   const [showDialog, setShowDialog] = useState(false);
 
-  if (!authUser) {
-    return (
-      <>
-        <p>Mangler login...</p>
-        <Button variant="outlined" onClick={() => showLogin(true)}>
-          Login
-        </Button>
-      </>
-    );
+  if (loading) {
+    return <SkeletonComponent />;
   }
 
-  if (loading || !events) {
-    return <SkeletonComponent />;
+  if (!events) {
+    return (
+      <Stack alignItems="center">
+        <Typography variant="subtitle1">
+          Der er ingen events på dette tidspunkt
+        </Typography>
+      </Stack>
+    );
   }
 
   const handleUpdate = async (
