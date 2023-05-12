@@ -2,6 +2,24 @@
 
 This project is for making a webapp for IQ96 on tour
 
+## Setup
+
+Before running project:
+Add file `src/settings/firebaseConfig.ts` with this firebase login (get this from your firebase console):
+
+    export const firebaseConfig = {
+    apiKey: <apiKey>,
+    authDomain: <authDomain>,
+    databaseURL: <databaseURL>,
+    projectId: <projectId>,
+    storageBucket: <storageBucket>,
+    messagingSenderId: <messagingSenderId>,
+    appId: <appId>,
+    };
+
+After that run
+### `npm install`
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -23,4 +41,3 @@ The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
