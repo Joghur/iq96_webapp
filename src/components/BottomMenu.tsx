@@ -4,17 +4,18 @@ import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import HomeIcon from '@mui/icons-material/Home';
-import SettingsIcon from '@mui/icons-material/Settings';
 import MapIcon from '@mui/icons-material/Map';
 import ChatIcon from '@mui/icons-material/Chat';
 import Paper from '@mui/material/Paper';
+import PersonIcon from '@mui/icons-material/Person';
 
 interface Props {
   value: number;
+  nick: string;
   onChange: (arg0: number) => void;
 }
 
-export default function FixedBottomNavigation({value, onChange}: Props) {
+export default function FixedBottomNavigation({value, nick, onChange}: Props) {
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -35,10 +36,7 @@ export default function FixedBottomNavigation({value, onChange}: Props) {
           <BottomNavigationAction label="IQ96" icon={<HomeIcon />} />
           <BottomNavigationAction label="Kort" icon={<MapIcon />} />
           <BottomNavigationAction label="Chat" icon={<ChatIcon />} />
-          <BottomNavigationAction
-            label="Indstillinger"
-            icon={<SettingsIcon />}
-          />
+          <BottomNavigationAction label={nick} icon={<PersonIcon />} />
         </BottomNavigation>
       </Paper>
     </Box>

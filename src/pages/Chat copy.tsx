@@ -40,9 +40,10 @@ export interface ChatType {
 interface Props {
   authUser: User | null;
   documentUser: DocumentUser | null;
+  showLogin: (arg0: boolean) => void;
 }
 
-const Chat = ({authUser, documentUser}: Props) => {
+const Chat = ({authUser, documentUser, showLogin}: Props) => {
   const [days, setDays] = useState(4);
   const {
     docs: chats,
@@ -53,6 +54,17 @@ const Chat = ({authUser, documentUser}: Props) => {
 
   const theme = useTheme();
   const small = useMediaQuery(theme.breakpoints.down('sm'));
+
+  if (!authUser) {
+    return (
+      <>
+        <p>Mangler login...</p>
+        <Button variant="outlined" onClick={() => showLogin(true)}>
+          Login
+        </Button>
+      </>
+    );
+  }
 
   if (loading) {
     return <SkeletonComponent />;
@@ -87,11 +99,9 @@ const Chat = ({authUser, documentUser}: Props) => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        width: small ? '100vw' : '95vw',
+        width: small ? '100vw' : '50vw',
       }}>
-      <Stack
-        justifyContent="center"
-        alignItems="center"
+      <Box
         sx={{
           flexGrow: 1,
           overflowY: 'auto',
@@ -197,7 +207,7 @@ const Chat = ({authUser, documentUser}: Props) => {
             </Box>
           )}
         </Paper>
-      </Stack>
+      </Box>
       <Box sx={{display: 'flex', gap: '16px', padding: '16px'}}>
         <TextField
           label="Skriv din besked"

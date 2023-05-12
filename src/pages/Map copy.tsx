@@ -46,6 +46,12 @@ interface MarkerData {
   type: string;
 }
 
+interface Props {
+  authUser: User | null;
+  documentUser: DocumentUser | null;
+  showLogin: (arg0: boolean) => void;
+}
+
 const handleDocType = (docType: string, madeBy: string) => {
   switch (madeBy) {
     case 'app':
@@ -135,6 +141,7 @@ const Map = ({authUser, documentUser, showLogin}: Props) => {
   const theme = useTheme();
   const small = useMediaQuery(theme.breakpoints.down('sm'));
 
+  //   console.log('markers', markers);
   const windowHeight = useRef(window.innerHeight);
 
   useEffect(() => {
@@ -152,8 +159,15 @@ const Map = ({authUser, documentUser, showLogin}: Props) => {
   const vh =
     ((windowHeight.current - minusHeaderBottom) * 100) / windowHeight.current;
 
-  if (!docs) {
-    return null;
+  if (!authUser) {
+    return (
+      <>
+        <p>Mangler login...</p>
+        <Button variant="outlined" onClick={() => showLogin(true)}>
+          Login
+        </Button>
+      </>
+    );
   }
 
   if (loading || !markers) {

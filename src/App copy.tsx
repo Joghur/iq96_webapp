@@ -10,7 +10,7 @@ import {checkVersion} from './utils/checkVersion';
 import Settings from './pages/Settings';
 import Login from './pages/login';
 import {RefreshButton} from './components/RefreshButton';
-import {Stack, CircularProgress, Typography, Box} from '@mui/material';
+import {Stack} from '@mui/material';
 import Chat from './pages/Chat';
 
 const handleHeaderTitle = (key: number) => {
@@ -32,35 +32,34 @@ const handleHeaderTitle = (key: number) => {
 const App = () => {
   const [authUser, documentUser, loading] = useDocumentUser();
   const [value, setValue] = React.useState(0);
-  const [showLogin, setShowLogin] = useState(false);
+  const [showLogin, setShowLogin] = useState(!authUser);
+
+  //   console.log('user', user?.displayName, user?.email);
 
   useEffect(() => {
     setInterval(checkVersion, 600);
   }, []);
 
-  const needLogin = !loading && showLogin;
-  const needAuthUser = loading && !authUser;
-  const needDocumentUser = loading && authUser && !documentUser;
+  //   console.log('showLogin', showLogin);
+  //   console.log('user', user);
 
-  if (needLogin) {
+  if (!authUser && showLogin) {
     return <Login open={showLogin} onClose={() => setShowLogin(false)} />;
   }
 
-  if (needAuthUser) {
+  if (loading && !documentUser) {
     return (
-      <Box sx={{top: 60}}>
-        <Stack alignItems="center">
-          <CircularProgress />
-        </Stack>
-      </Box>
+      <>
+        <b>Genopfrisk siden</b>
+        <RefreshButton />
+      </>
     );
   }
 
-  if (needDocumentUser) {
+  if (!documentUser) {
     return (
-      <Stack alignItems="center">
-        <Typography variant="subtitle1">Data har kløjst i det</Typography>
-        <Typography>Genopfrisk siden</Typography>
+      <Stack spacing={2}>
+        <b>Genopfrisk siden</b>
         <RefreshButton />
       </Stack>
     );
@@ -69,10 +68,28 @@ const App = () => {
   return (
     <>
       <CssBaseline />
-      <Header banner={handleHeaderTitle(value)} nick={documentUser?.nick} />
-      {value === 0 && <Home documentUser={documentUser} />}
-      {value === 1 && <Map />}
-      {value === 2 && <Chat authUser={authUser} documentUser={documentUser} />}
+      {/* <Header banner={handleHeaderTitle(value)} nick={documentUser?.nick} /> */}
+      {value === 0 && (
+        <Home
+          authUser={authUser}
+          documentUser={documentUser}
+          showLogin={setShowLogin}
+        />
+      )}
+      {value === 1 && (
+        <Map
+          authUser={authUser}
+          documentUser={documentUser}
+          showLogin={setShowLogin}
+        />
+      )}
+      {value === 2 && (
+        <Chat
+          authUser={authUser}
+          documentUser={documentUser}
+          showLogin={setShowLogin}
+        />
+      )}
       {value === 3 && (
         <Settings
           authUser={authUser}

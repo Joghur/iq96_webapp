@@ -62,7 +62,14 @@ export const useFirestore = <T extends DocumentData>(
   };
 
   const deletingDoc = async (id: string) => {
-    console.log('deletingDoc', id);
+    const docRef = doc(collectionRef, id);
+    deleteDoc(docRef)
+      .then(() => {
+        console.log(`Document with ID ${id} deleted successfully!`);
+      })
+      .catch(error => {
+        console.error(`Error deleting document with ID ${id}: `, error);
+      });
   };
 
   useEffect(() => {
@@ -104,7 +111,14 @@ export const useFirestoreMax4Days = (
   };
 
   const deletingDoc = async (id: string) => {
-    console.log('deletingDoc', id);
+    const docRef = doc(collectionRef, id);
+    deleteDoc(docRef)
+      .then(() => {
+        console.log(`Document with ID ${id} deleted successfully!`);
+      })
+      .catch(error => {
+        console.error(`Error deleting document with ID ${id}: `, error);
+      });
   };
 
   useEffect(() => {
@@ -178,7 +192,6 @@ export const deleteMapMarkers = () => {
       querySnapshot.forEach(document => {
         const docRef = doc(db, 'map', document.id);
 
-        // Delete the document
         deleteDoc(docRef)
           .then(() => {
             console.log(
