@@ -155,7 +155,7 @@ const Map = ({authUser, documentUser, showLogin}: Props) => {
     );
   }, []);
 
-  const minusHeaderBottom = small ? 55 : 60;
+  const minusHeaderBottom = small ? 150 : 60;
   const vh =
     ((windowHeight.current - minusHeaderBottom) * 100) / windowHeight.current;
 

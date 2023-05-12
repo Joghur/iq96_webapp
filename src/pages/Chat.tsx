@@ -6,9 +6,10 @@ import {
   Paper,
   List,
   ListItem,
-  ListItemText,
   useMediaQuery,
   useTheme,
+  Avatar,
+  Chip,
 } from '@mui/material';
 import {DocumentUser, useFirestoreMax4Days} from '../utils/hooks/useFirestore';
 import {User} from 'firebase/auth';
@@ -16,6 +17,25 @@ import SkeletonComponent from '../components/SkeletonComponent';
 import {convertEpochSecondsToDateString} from '../utils/dates';
 import {Stack} from '@mui/system';
 import DynamicText from '../components/DynamicText';
+import {colors} from '../utils/colours';
+import moment from 'moment';
+
+type FirebaseTimestamp = {
+  seconds: number;
+};
+
+interface ChatUser {
+  id: string;
+  name: string;
+  avatar?: string;
+}
+
+export interface ChatType {
+  createdAt: Date | FirebaseTimestamp;
+  group: string;
+  text: string;
+  user: ChatUser;
+}
 
 interface Props {
   authUser: User | null;
@@ -25,11 +45,11 @@ interface Props {
 
 const Chat = ({authUser, documentUser, showLogin}: Props) => {
   const [days, setDays] = useState(4);
-  const {docs, loading, addingDoc} = useFirestoreMax4Days(
-    'chats',
-    'createdAt',
-    days,
-  );
+  const {
+    docs: chats,
+    loading,
+    addingDoc,
+  } = useFirestoreMax4Days('chats', 'createdAt', days);
   const [input, setInput] = useState<string>('');
 
   const theme = useTheme();
@@ -62,13 +82,16 @@ const Chat = ({authUser, documentUser, showLogin}: Props) => {
         text: input.trim(),
         user: {
           id: authUser?.uid,
-          name: documentUser?.nick,
+          name: documentUser?.nick || 'Ukendt',
           avatar: documentUser?.avatar,
         },
       });
       setInput('');
     }
   };
+
+  let dayAsMilliSeconds = 0;
+  let showDay = true;
 
   return (
     <Box
@@ -93,38 +116,89 @@ const Chat = ({authUser, documentUser, showLogin}: Props) => {
           </Button>
         </Stack>
         <Paper variant="outlined">
-          {docs.length > 0 && (
+          {chats.length > 0 && (
             <List>
-              {docs.map((message, index) => (
-                <Stack direction="row">
-                  <ListItem
-                    key={index}
-                    alignItems="flex-start"
-                    sx={{
-                      padding: '8px 16px',
-                      textAlign:
-                        authUser.uid === message.user.id ? 'right' : 'left',
-                    }}>
-                    {/* <ListItemAvatar>
-                    <Avatar
-                      alt={message.user.name}
-                      src={`${documentUser?.avatar}.jpg`}
-                    />
-                  </ListItemAvatar> */}
-                    <ListItemText
-                      primary={`${
-                        message.user.name
-                      } - ${convertEpochSecondsToDateString(
-                        message.createdAt.seconds,
-                      )}`}
-                      secondary={message.text}
-                    />
-                  </ListItem>
-                </Stack>
-              ))}
+              {chats.map((chat, index) => {
+                const isChatUser = chat.user.name === documentUser?.nick;
+
+                const isSame = moment(chat.createdAt.seconds * 1000).isSame(
+                  moment(dayAsMilliSeconds),
+                  'date',
+                );
+
+                if (!isSame) {
+                  showDay = true;
+                } else {
+                  showDay = false;
+                }
+                dayAsMilliSeconds = chat.createdAt.seconds * 1000;
+
+                return (
+                  <>
+                    {showDay && (
+                      <ListItem
+                        key={index}
+                        alignItems="center"
+                        sx={{
+                          justifyContent: 'center',
+                        }}>
+                        <Chip
+                          label={convertEpochSecondsToDateString(
+                            chat.createdAt.seconds,
+                            'D/MMM-YYYY',
+                          )}
+                        />
+                      </ListItem>
+                    )}
+                    <ListItem
+                      key={index}
+                      alignItems="flex-start"
+                      sx={{
+                        justifyContent: isChatUser ? 'flex-end' : 'flex-start',
+                      }}>
+                      <Paper
+                        elevation={2}
+                        sx={{
+                          p: 2,
+                          ml: isChatUser ? 8 : 2,
+                          mr: isChatUser ? 2 : 8,
+                          backgroundColor: isChatUser
+                            ? colors.lightSuccess
+                            : colors.button,
+                        }}>
+                        <Stack direction="row" spacing={1}>
+                          <Avatar
+                            alt={chat.user.name}
+                            src={`${process.env.PUBLIC_URL}/images/avatars/${chat.user?.avatar}.png`}
+                          />
+                          <Stack>
+                            <Stack
+                              direction="row"
+                              spacing={2}
+                              alignItems="center">
+                              <DynamicText desktop="body1" mobile="body2">
+                                {chat.user.name}
+                              </DynamicText>
+                              <DynamicText desktop="body2" mobile="caption">
+                                {convertEpochSecondsToDateString(
+                                  chat.createdAt.seconds,
+                                  'HH:mm',
+                                )}
+                              </DynamicText>
+                            </Stack>
+                            <DynamicText desktop="body2" mobile="caption">
+                              {chat.text}
+                            </DynamicText>
+                          </Stack>
+                        </Stack>
+                      </Paper>
+                    </ListItem>
+                  </>
+                );
+              })}
             </List>
           )}
-          {docs.length === 0 && (
+          {chats.length === 0 && (
             <Box>
               <DynamicText sx={{p: 2}}>
                 Der er ingen chats indenfor de sidste par dage. Prøv at trykke
@@ -152,3 +226,11 @@ const Chat = ({authUser, documentUser, showLogin}: Props) => {
 };
 
 export default memo(Chat);
+
+// primary={`${
+//     message.user.name
+//   } - ${convertEpochSecondsToDateString(
+//       message.createdAt.seconds,
+//       )}`}
+// secondary={message.text}
+// />
