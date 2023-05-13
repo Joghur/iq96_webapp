@@ -13,6 +13,7 @@ import SpinnerComponent from './components/SpinnerComponent';
 import {Stack, CircularProgress, Button, Typography} from '@mui/material';
 import {Box} from '@mui/system';
 import {RefreshButton} from './components/Buttons';
+import {logOut} from './utils/auth';
 
 const handleHeaderTitle = (key: number) => {
   switch (key) {
@@ -94,7 +95,8 @@ const App = () => {
                   </ul>
                 </Stack>
                 <Stack alignItems="center">
-                  <Button onClick={() => setShowLogin(true)}>Login</Button>
+                  <Button onClick={() => setShowLogin(true)}>Log ind</Button>
+                  <Button onClick={async () => await logOut()}>Log ud</Button>
                   <RefreshButton />
                 </Stack>
               </Stack>
