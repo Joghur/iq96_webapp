@@ -7,11 +7,10 @@ import Header from './components/Header';
 import Map from './pages/Map';
 import Home from './pages/Home';
 import {checkVersion} from './utils/checkVersion';
-import Settings from './pages/Settings';
+import About from './pages/About';
 import Login from './pages/login';
-import {RefreshButton} from './components/RefreshButton';
-import {Stack, CircularProgress, Typography, Box} from '@mui/material';
 import Chat from './pages/Chat';
+import SpinnerComponent from './components/SpinnerComponent';
 
 const handleHeaderTitle = (key: number) => {
   switch (key) {
@@ -22,7 +21,7 @@ const handleHeaderTitle = (key: number) => {
       return 'Chat';
 
     case 3:
-      return 'Indstillinger';
+      return 'Med-lem og App info';
 
     default:
       return 'Oversigt';
@@ -46,24 +45,8 @@ const App = () => {
     return <Login open={showLogin} onClose={() => setShowLogin(false)} />;
   }
 
-  if (needAuthUser) {
-    return (
-      <Box sx={{top: 60}}>
-        <Stack alignItems="center">
-          <CircularProgress />
-        </Stack>
-      </Box>
-    );
-  }
-
-  if (needDocumentUser || !documentUser?.nick) {
-    return (
-      <Stack alignItems="center">
-        <Typography variant="subtitle1">Data har kløjst i det</Typography>
-        <Typography>Genopfrisk siden</Typography>
-        <RefreshButton />
-      </Stack>
-    );
+  if (needAuthUser || needDocumentUser || !documentUser?.nick) {
+    return <SpinnerComponent />;
   }
 
   return (
@@ -74,7 +57,7 @@ const App = () => {
       {value === 1 && <Map documentUser={documentUser} />}
       {value === 2 && <Chat authUser={authUser} documentUser={documentUser} />}
       {value === 3 && (
-        <Settings
+        <About
           authUser={authUser}
           documentUser={documentUser}
           showLogin={setShowLogin}

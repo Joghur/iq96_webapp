@@ -24,7 +24,6 @@ import {
   useTheme,
 } from '@mui/material';
 import SkeletonComponent from '../components/SkeletonComponent';
-import type {User} from 'firebase/auth';
 import SelectComponent from '../components/SelectComponent';
 import {BoldText} from '../components/FormDialog';
 import EditIcon from '@mui/icons-material/Edit';
