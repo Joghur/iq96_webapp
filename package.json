@@ -1,6 +1,6 @@
 {
     "name": "iq96-webapp",
-    "version": "0.5.9",
+    "version": "0.6.0",
     "private": true,
     "dependencies": {
         "@emotion/react": "11.10.6",

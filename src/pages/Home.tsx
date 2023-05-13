@@ -1,12 +1,10 @@
-// import {useAuth, useFirestore} from '@src/utils/hooks/useFirestore';
 import {DocumentUser, useFirestore} from '../utils/hooks/useFirestore';
 import React, {memo, useState} from 'react';
 import {Box, Button, Paper, Stack, Typography} from '@mui/material';
 import {handleType} from '../utils/convertEventType';
 import FormDialog from '../components/FormDialog';
-import SkeletonComponent from '../components/SkeletonComponent';
 import DynamicText from '../components/DynamicText';
-import type {User} from 'firebase/auth';
+import SpinnerComponent from '../components/SpinnerComponent';
 
 interface FirebaseDate {
   seconds: number;
@@ -42,7 +40,7 @@ const Home = ({documentUser}: Props) => {
   const [showDialog, setShowDialog] = useState(false);
 
   if (loading) {
-    return <SkeletonComponent />;
+    return <SpinnerComponent />;
   }
 
   if (!events) {
