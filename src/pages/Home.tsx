@@ -1,10 +1,16 @@
 import {DocumentUser, useFirestore} from '../utils/hooks/useFirestore';
 import React, {memo, useState} from 'react';
-import {Box, Button, Paper, Stack, Typography} from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material';
 import {handleType} from '../utils/convertEventType';
 import FormDialog from '../components/FormDialog';
 import DynamicText from '../components/DynamicText';
-import SpinnerComponent from '../components/SpinnerComponent';
 
 interface FirebaseDate {
   seconds: number;
@@ -39,8 +45,14 @@ const Home = ({documentUser}: Props) => {
   const [currentEvent, setCurrentEvent] = useState<EventType | null>(null);
   const [showDialog, setShowDialog] = useState(false);
 
+  console.log('Home');
+
   if (loading) {
-    return <SpinnerComponent />;
+    return (
+      <Stack alignItems="center" spacing={3}>
+        <CircularProgress />
+      </Stack>
+    );
   }
 
   if (!events) {
@@ -120,13 +132,15 @@ const Home = ({documentUser}: Props) => {
                       <strong>Mødesteder:</strong>
                     </DynamicText>
                     <DynamicText mobile="caption">
-                      {event.meetingPoints.split('--').map((f: string) => {
-                        return (
-                          <Box sx={{ml: 4}}>
-                            <li>{f.trim()}</li>
-                          </Box>
-                        );
-                      })}
+                      {event.meetingPoints
+                        .split('--')
+                        .map((f: string, index: number) => {
+                          return (
+                            <Box sx={{ml: 4}}>
+                              <li key={index}>{f.trim()}</li>
+                            </Box>
+                          );
+                        })}
                     </DynamicText>
                   </Stack>
                 )}
@@ -136,13 +150,15 @@ const Home = ({documentUser}: Props) => {
                       <strong>OBS:</strong>
                     </DynamicText>
                     <DynamicText mobile="caption">
-                      {event.notes.split('--').map((f: string) => {
-                        return (
-                          <Box sx={{ml: 4}}>
-                            <li>{f.trim()}</li>
-                          </Box>
-                        );
-                      })}
+                      {event.notes
+                        .split('--')
+                        .map((f: string, index: number) => {
+                          return (
+                            <Box sx={{ml: 4}}>
+                              <li key={index}>{f.trim()}</li>
+                            </Box>
+                          );
+                        })}
                     </DynamicText>
                   </Stack>
                 )}

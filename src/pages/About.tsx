@@ -9,10 +9,10 @@ import AboutTab from './AboutPages/AboutTab';
 interface Props {
   authUser: User | null;
   documentUser: DocumentUser | null;
-  showLogin: (arg0: boolean) => void;
+  setShowLogin: (arg0: boolean) => void;
 }
 
-const About = ({authUser, documentUser, showLogin}: Props) => {
+const About = ({authUser, documentUser, setShowLogin}: Props) => {
   const [value, setValue] = useState(0);
 
   const handleChange = (_: unknown, newValue: React.SetStateAction<number>) => {
@@ -34,7 +34,7 @@ const About = ({authUser, documentUser, showLogin}: Props) => {
           <UserTab
             authUser={authUser}
             documentUser={documentUser}
-            showLogin={showLogin}
+            setShowLogin={setShowLogin}
           />
         )}
         {value === 1 && <AboutTab />}
