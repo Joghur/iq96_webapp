@@ -11,8 +11,8 @@ const AboutTab = () => {
       </DynamicText>
       <ul>
         <li>
-          0.6.0 - Omdåbt Indstillinger til Om (About) da der ikke er så meget at
-          indstille - Opdateret
+          0.6.0 - Omdåbt Indstillinger til Med-lem, da der ikke er så meget at
+          indstille - Opdateret Med-lems siden med tabs
         </li>
         <li>
           0.4.4 - Forbedret login oplevelse (mindre flimren) - check for om
