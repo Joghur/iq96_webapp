@@ -116,7 +116,11 @@ function UserMapButton() {
   );
 }
 
-const Map = ({authUser, documentUser, showLogin}: Props) => {
+interface Props {
+  documentUser: DocumentUser | null;
+}
+
+const Map = ({documentUser}: Props) => {
   const {
     docs: markers,
     loading,
@@ -152,11 +156,7 @@ const Map = ({authUser, documentUser, showLogin}: Props) => {
   const vh =
     ((windowHeight.current - minusHeaderBottom) * 100) / windowHeight.current;
 
-  if (!docs) {
-    return null;
-  }
-
-  if (loading || !markers) {
+  if (loading) {
     return <SkeletonComponent />;
   }
 
@@ -210,7 +210,7 @@ const Map = ({authUser, documentUser, showLogin}: Props) => {
             style={{height: `${vh}vh`, width: '100wh'}}>
             <Stack direction="row" justifyContent="flex-end">
               <UserMapButton />
-              <FlyToSelector markers={markers} />
+              {markers && <FlyToSelector markers={markers} />}
             </Stack>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -232,132 +232,139 @@ const Map = ({authUser, documentUser, showLogin}: Props) => {
                 {documentUser?.nick}
               </Tooltip>
             </Marker>
-            {markers.map((marker, index) => (
-              <Marker
-                key={index}
-                position={[marker.location.latitude, marker.location.longitude]}
-                icon={
-                  new Icon({
-                    iconUrl: `${
-                      process.env.PUBLIC_URL
-                    }/images/markers/${handleDocType(
-                      marker.type,
-                      marker.madeBy,
-                    )}.png`,
-                    iconSize: [25, 25],
-                    iconAnchor: [18, 18],
-                    popupAnchor: [0, -10],
-                  })
-                }>
-                <Popup>
-                  <div>
-                    {!showEdit && (
-                      <>
-                        <Stack spacing={2}>
-                          <DynamicText desktop="h5" mobile="h6">
-                            {marker.title}
-                          </DynamicText>
-                        </Stack>
-                        <DynamicText>{marker.description}</DynamicText>
-                        <Stack
-                          direction="row"
-                          spacing={3}
-                          justifyContent="flex-end">
-                          <EditIcon
-                            fontSize="small"
-                            onClick={() => handleOpenEditMarker(marker)}
-                          />
-                          {documentUser?.nick === 'Redacteur' && (
-                            <DeleteIcon
+            {markers &&
+              markers.map((marker, index) => (
+                <Marker
+                  key={index}
+                  position={[
+                    marker.location.latitude,
+                    marker.location.longitude,
+                  ]}
+                  icon={
+                    new Icon({
+                      iconUrl: `${
+                        process.env.PUBLIC_URL
+                      }/images/markers/${handleDocType(
+                        marker.type,
+                        marker.madeBy,
+                      )}.png`,
+                      iconSize: [25, 25],
+                      iconAnchor: [18, 18],
+                      popupAnchor: [0, -10],
+                    })
+                  }>
+                  <Popup>
+                    <div>
+                      {!showEdit && (
+                        <>
+                          <Stack spacing={2}>
+                            <DynamicText desktop="h5" mobile="h6">
+                              {marker.title}
+                            </DynamicText>
+                          </Stack>
+                          <DynamicText>{marker.description}</DynamicText>
+                          <Stack
+                            direction="row"
+                            spacing={3}
+                            justifyContent="flex-end">
+                            <EditIcon
                               fontSize="small"
-                              onClick={() => handleOpenDeleteModal(marker)}
+                              onClick={() => handleOpenEditMarker(marker)}
                             />
-                          )}
-                        </Stack>
-                      </>
-                    )}
-                    {showEdit && canEdit && currentMarker && (
-                      <Typography>
+                            {documentUser?.nick === 'Redacteur' && (
+                              <DeleteIcon
+                                fontSize="small"
+                                onClick={() => handleOpenDeleteModal(marker)}
+                              />
+                            )}
+                          </Stack>
+                        </>
+                      )}
+                      {showEdit && canEdit && currentMarker && (
                         <Typography>
-                          <Stack spacing={1} sx={{pt: 2}}>
-                            <>
-                              <Stack>
-                                <BoldText variant="subtitle1">Titel</BoldText>
-                                <TextField
-                                  id="title"
-                                  type="text"
-                                  value={currentMarker?.title}
-                                  onChange={handleChangeMarker}
-                                  placeholder={currentMarker?.title || 'Titel'}
-                                  size="small"
-                                />
-                              </Stack>
-                              <Stack>
-                                <BoldText variant="subtitle1">Nick</BoldText>
-                                <TextField
-                                  id="nick"
-                                  type="text"
-                                  value={currentMarker?.nick}
-                                  onChange={handleChangeMarker}
-                                  placeholder={currentMarker?.nick || 'Nick'}
-                                  size="small"
-                                />
-                              </Stack>
-                              <Stack>
-                                <BoldText variant="subtitle1">Type</BoldText>
-                                <TextField
-                                  id="madeBy"
-                                  type="text"
-                                  value={currentMarker?.madeBy}
-                                  onChange={handleChangeMarker}
-                                  placeholder={
-                                    currentMarker?.madeBy ||
-                                    'Type: app eller user'
-                                  }
-                                  size="small"
-                                />
-                              </Stack>
-                              <Stack>
-                                <BoldText variant="subtitle1">
-                                  Beskrivelse
-                                </BoldText>
-                                <TextField
-                                  id="description"
-                                  type="text"
-                                  value={currentMarker?.description}
-                                  multiline
-                                  onChange={handleChangeMarker}
-                                  placeholder={
-                                    currentMarker?.description || 'Beskrivelse'
-                                  }
-                                  size="small"
-                                />
-                              </Stack>
-                            </>
+                          <Typography>
+                            <Stack spacing={1} sx={{pt: 2}}>
+                              <>
+                                <Stack>
+                                  <BoldText variant="subtitle1">Titel</BoldText>
+                                  <TextField
+                                    id="title"
+                                    type="text"
+                                    value={currentMarker?.title}
+                                    onChange={handleChangeMarker}
+                                    placeholder={
+                                      currentMarker?.title || 'Titel'
+                                    }
+                                    size="small"
+                                  />
+                                </Stack>
+                                <Stack>
+                                  <BoldText variant="subtitle1">Nick</BoldText>
+                                  <TextField
+                                    id="nick"
+                                    type="text"
+                                    value={currentMarker?.nick}
+                                    onChange={handleChangeMarker}
+                                    placeholder={currentMarker?.nick || 'Nick'}
+                                    size="small"
+                                  />
+                                </Stack>
+                                <Stack>
+                                  <BoldText variant="subtitle1">Type</BoldText>
+                                  <TextField
+                                    id="madeBy"
+                                    type="text"
+                                    value={currentMarker?.madeBy}
+                                    onChange={handleChangeMarker}
+                                    placeholder={
+                                      currentMarker?.madeBy ||
+                                      'Type: app eller user'
+                                    }
+                                    size="small"
+                                  />
+                                </Stack>
+                                <Stack>
+                                  <BoldText variant="subtitle1">
+                                    Beskrivelse
+                                  </BoldText>
+                                  <TextField
+                                    id="description"
+                                    type="text"
+                                    value={currentMarker?.description}
+                                    multiline
+                                    onChange={handleChangeMarker}
+                                    placeholder={
+                                      currentMarker?.description ||
+                                      'Beskrivelse'
+                                    }
+                                    size="small"
+                                  />
+                                </Stack>
+                              </>
+                            </Stack>
+                          </Typography>
+                          <Stack direction="row" justifyContent="space-between">
+                            <Button
+                              variant="outlined"
+                              onClick={() => setShowEdit(false)}
+                              color={'error'}>
+                              Fortryd
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              onClick={handleSubmitMarker}>
+                              Ændr
+                            </Button>
                           </Stack>
                         </Typography>
-                        <Stack direction="row" justifyContent="space-between">
-                          <Button
-                            variant="outlined"
-                            onClick={() => setShowEdit(false)}
-                            color={'error'}>
-                            Fortryd
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            onClick={handleSubmitMarker}>
-                            Ændr
-                          </Button>
-                        </Stack>
-                      </Typography>
-                    )}
-                  </div>
-                </Popup>
-                <Tooltip direction="bottom" offset={[0, 20]} opacity={1}>
-                  {marker.nick}
-                </Tooltip>
-              </Marker>
-            ))}
+                      )}
+                    </div>
+                  </Popup>
+                  <Tooltip direction="bottom" offset={[0, 20]} opacity={1}>
+                    {marker.nick}
+                  </Tooltip>
+                </Marker>
+              ))}
           </MapContainer>
           {showDeleteModal && (
             <>

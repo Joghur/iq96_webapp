@@ -56,7 +56,7 @@ const App = () => {
     );
   }
 
-  if (needDocumentUser) {
+  if (needDocumentUser || !documentUser?.nick) {
     return (
       <Stack alignItems="center">
         <Typography variant="subtitle1">Data har kløjst i det</Typography>
@@ -71,7 +71,7 @@ const App = () => {
       <CssBaseline />
       <Header banner={handleHeaderTitle(value)} nick={documentUser?.nick} />
       {value === 0 && <Home documentUser={documentUser} />}
-      {value === 1 && <Map />}
+      {value === 1 && <Map documentUser={documentUser} />}
       {value === 2 && <Chat authUser={authUser} documentUser={documentUser} />}
       {value === 3 && (
         <Settings
@@ -82,7 +82,7 @@ const App = () => {
       )}
       <FixedBottomNavigation
         value={value}
-        nick={documentUser?.nick}
+        nick={documentUser.nick}
         onChange={setValue}
       />
     </>
