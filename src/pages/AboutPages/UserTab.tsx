@@ -8,10 +8,10 @@ import {DocumentUser} from '../../utils/hooks/useFirestore';
 interface Props {
   authUser: User | null;
   documentUser: DocumentUser | null;
-  showLogin: (arg0: boolean) => void;
+  setShowLogin: (arg0: boolean) => void;
 }
 
-const UserTab = ({authUser, documentUser, showLogin}: Props) => {
+const UserTab = ({authUser, documentUser, setShowLogin}: Props) => {
   return (
     <Stack alignItems="center" spacing={2}>
       <DynamicText>
@@ -25,7 +25,7 @@ const UserTab = ({authUser, documentUser, showLogin}: Props) => {
       <Button
         onClick={async () => {
           await logOut();
-          () => showLogin(false);
+          () => setShowLogin(false);
         }}>
         Logout
       </Button>

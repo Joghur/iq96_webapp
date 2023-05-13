@@ -10,6 +10,7 @@ import {
   useTheme,
   Avatar,
   Chip,
+  CircularProgress,
 } from '@mui/material';
 import {DocumentUser, useFirestoreMax4Days} from '../utils/hooks/useFirestore';
 import {User} from 'firebase/auth';
@@ -18,7 +19,6 @@ import {Stack} from '@mui/system';
 import DynamicText from '../components/DynamicText';
 import {colors} from '../utils/colours';
 import moment from 'moment';
-import SpinnerComponent from '../components/SpinnerComponent';
 
 type FirebaseTimestamp = {
   seconds: number;
@@ -55,7 +55,11 @@ const Chat = ({authUser, documentUser}: Props) => {
   const small = useMediaQuery(theme.breakpoints.down('sm'));
 
   if (loading) {
-    return <SpinnerComponent />;
+    return (
+      <Stack alignItems="center" spacing={3}>
+        <CircularProgress />
+      </Stack>
+    );
   }
 
   const handleChangeDays = (days = 10) => {
